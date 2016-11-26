@@ -13,9 +13,16 @@ gen.conj.distr <- function(n) {
 }
 
 
-N <- 10000
+N  <- 2500
 XY <- gen.conj.distr(N)
 
-title=sprintf('Distribution f(x,y)=2, 0≤y<x<1 (n=%d)',N)
-plot(XY, pch=".", xlim=c(0,1), ylim=c(0,2),main=title)
-abline(0, 2, col="blue")
+title    <- sprintf('Distribution f(x,y)=2, 0≤y<x<1 (n=%d)',N)
+#filename <- sprintf('multivar_distr_%d.png',N)
+
+#png(file=filename,width=400,height=350)
+
+par(cex.axis=0.8, pty="s")
+plot(XY, pch='.', xlim=c(0,1), ylim=c(0,1.5), col='gray45', main=title)
+abline(0, 1, col='red')
+
+#dev.off()
