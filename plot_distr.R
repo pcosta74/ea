@@ -1,14 +1,20 @@
 library(rgl)
 
-pdf <- function(x,y,set.null=FALSE) {
-  z0 <- if(set.null) NA else 0
+pdf <- function(x,y,z0=NA) {
   z <- rep(z0,length(x))
   z[0<=y & y<=x & x<1] <- 2
   z
 }
 
-plot_pdf <- function(x,y,set.null=FALSE) {
-  z <- pdf(x,y,set.null)
+cdf <- function(x,y,z0=NA) {
+  i <- c(0<=y & y<=x & x<1) 
+  z <- rep(z0,length(x))
+  z[i] <- 2*x[i]*y[i]
+  z
+}
+
+plot3D_fun <- function(x,y,FUN=pdf,z0=NA) {
+  z <- FUN(x,y,z0)
   
   x.min <- floor(min(x, na.rm = TRUE))
   x.max <- ceiling(max(x, na.rm = TRUE))
@@ -32,7 +38,8 @@ plot_pdf <- function(x,y,set.null=FALSE) {
 N <- 25000
 X <- runif(N)
 Y <- runif(N)
-plot_pdf(X,Y,set.null=TRUE)
+plot3D_fun(X,Y,FUN=pdf)
+plot3D_fun(X,Y,FUN=cdf)
 
 #X <- runif(N,-1,2)
 #Y <- runif(N,-1,2)
