@@ -1,4 +1,4 @@
-gen.mix.distr <- function(p,lambda,a,b,nvals) {
+gen.mix.distr <- function(p2,a,b,lambda,nvals) {
   X <- NULL
   U <- runif(nvals)
 
@@ -6,8 +6,8 @@ gen.mix.distr <- function(p,lambda,a,b,nvals) {
   while(n < nvals) {
     pn <- runif(1)
     n <- n + 1
-    if(pn < p) {
-      X[n] <- -log(U[n])/lambda
+    if(pn < p2) {
+      X[n] <- (-1/lambda)*log(U[n])
     } else {
       X[n] <- U[n]*(b-a)+a
     }
@@ -24,7 +24,7 @@ test.mix.distr <- function(nvals, breaks=50) {
   lmb <- 2
   p2 <- 0.4
   
-  XX <- gen.mix.distr(p2,lmb,a,b,nvals)
+  XX <- gen.mix.distr(p2,a,b,lmb,nvals)
   
   par(cex.axis=0.8, pty="s")
   
@@ -37,14 +37,14 @@ test.mix.distr <- function(nvals, breaks=50) {
        xlab="x", ylab="f(x)",
        main=title)
   
-  x <- seq(x.min,x.max,0.005)
+  x <- seq(x.min,x.max,1/nvals)
   lines(x,p1*dunif(x,min=a,max=b) + p2*dexp(x,rate=lmb), col='red')
   
   #q.pop <- quantile(d,prob=seq(0.5/nvals,1,1/nvals))
-  q.pop <-qunif(p1,min=a,max=b)+qexp(p2,rate=lmb)
-  qq <- cbind(sort(XX), q.pop)
-  plot(qq,pch=".", xlim=c(-3,3), ylim=c(-3,3), xlab="X", ylab="Y", main="QQ plot")
-  abline(0,1,col="red")
+  #q.pop <-qunif(p1,min=a,max=b)+qexp(p2,rate=lmb)
+  #qq <- cbind(sort(XX), q.pop)
+  #plot(qq,pch=".", xlim=c(-3,3), ylim=c(-3,3), xlab="X", ylab="Y", main="QQ plot")
+  #abline(0,1,col="red")
 }
 
 
