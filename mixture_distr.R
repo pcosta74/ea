@@ -15,7 +15,7 @@ gen.mix.distr <- function(p2,a,b,lambda,nvals) {
   X
 }
 
-test.mix.distr <- function(nvals, breaks=50) {
+plot.mix.distr <- function(nvals, breaks=50) {
   # X1 ~ U[-2,2]
   a <- -2; b <- 2
   p1 <- 0.6

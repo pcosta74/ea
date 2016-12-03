@@ -12,7 +12,7 @@ gen.bivar.distr <- function(nvals) {
   XY
 }
 
-test.bivar.distr <- function(nvals) {
+plot.bivar.distr <- function(nvals) {
   XY <- gen.bivar.distr(nvals)
 
   par(cex.axis=0.8, pty="s")
