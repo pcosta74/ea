@@ -1,13 +1,28 @@
-gen.mix.distr <- function(p2,a,b,lambda,nvals) {
+#
+# f(x) = Sum[i=1..r]pifi(x)
+# X1 ~ U[-2,2]
+# X2 ~ Exp(2)
+#
+pdf <- function(x, p1, a, b, lambda) {
+  p1 * dunif(x, min=a, max=b) + (1-p1) * dexp(x, rate=lambda)
+}
+
+#
+# U ~ F(X) => X ~ F-1(U)
+# U ~ U[0,1]
+# X ~ p1*U[-2,2] + p2*Exp(2)
+#
+gen.mix.distr <- function(nvals, p1, a, b, lambda) {
   X <- NULL
   U <- runif(nvals)
 
-  n <- 0
+  p2 <- 1-p1
+  n  <- 0
   while(n < nvals) {
     pn <- runif(1)
     n <- n + 1
     if(pn < p2) {
-      X[n] <- (-1/lambda)*log(U[n])
+      X[n] <- -log(U[n])/lambda
     } else {
       X[n] <- U[n]*(b-a)+a
     }
@@ -15,36 +30,88 @@ gen.mix.distr <- function(p2,a,b,lambda,nvals) {
   X
 }
 
-plot.mix.distr <- function(nvals, breaks=50) {
-  # X1 ~ U[-2,2]
-  a <- -2; b <- 2
-  p1 <- 0.6
+#
+# Plot the distributions
+#
+plot.mix.distr <- function(XX, fx, gx, a, b, lambda, breaks=50) {
   
-  # X2 ~ Exp(2)
-  lmb <- 2
-  p2 <- 0.4
+  x.min <- min(XX); y.min <- 0
+  x.max <- max(XX); y.max <- 1 
   
-  XX <- gen.mix.distr(p2,a,b,lmb,nvals)
+  title <- sprintf("Composition method to add U[%d,%d] and Exp(%d)",
+                   a, b, lambda)
   
   par(cex.axis=0.8, pty="s")
-  
-  x.min <- -3; x.max <- 3
-  y.min <- 0;  y.max <- 1
-  
-  title <- sprintf("Composition method to add U[%d,%d] and Exp(%d)",a,b,lmb)
-  hist(XX, probability=TRUE, breaks=breaks,
+  hist(gx, probability=TRUE, breaks=breaks,
        xlim=c(x.min,x.max), ylim=c(y.min,y.max),
-       xlab="x", ylab="f(x)",
-       main=title)
+       xlab="x", ylab="f(x)", main=title)
+  lines(XX, fx, col='red')
+}
+
+#
+#
+#
+qqplot <- function(nvals, X, Y) {
+  q <- seq(0.5/nvals, 1 , 1/nvals)
   
-  x <- seq(x.min,x.max,1/nvals)
-  lines(x,p1*dunif(x,min=a,max=b) + p2*dexp(x,rate=lmb), col='red')
+  qq.popX <- quantile(X, prob=q)
+  qq.popY <- quantile(Y, prob=q)
+  qq <- cbind(qq.popX, qq.popY)
   
-  #q.pop <- quantile(d,prob=seq(0.5/nvals,1,1/nvals))
-  #q.pop <-qunif(p1,min=a,max=b)+qexp(p2,rate=lmb)
-  #qq <- cbind(sort(XX), q.pop)
-  #plot(qq,pch=".", xlim=c(-3,3), ylim=c(-3,3), xlab="X", ylab="Y", main="QQ plot")
-  #abline(0,1,col="red")
+  plot(qq,pch=".", xlim=c(-3,3), ylim=c(-3,3), xlab="X", ylab="Y", main="QQ plot")
+  abline(0,1,col="red")
+}
+
+#
+# Kolmogorov-Smirnoff test
+#
+ks.mix.distr <- function(A,B,alpha=0.01) {
+  q  <- seq(0, 1, 0.01)
+  sA <- quantile(A, prob=q)
+  sB <- quantile(B, prob=q)
+  T <- rbind(cbind(X=sA,set=1,FnA=0,FnB=0,DFn=0),
+             cbind(X=sB,set=2,FnA=0,FnB=0,DFn=0))
+  
+  T <- T[order(T[,'X']),]
+  N <- length(q)
+  for(n in seq(2*N)) {
+    T[n,'FnA'] <- sum(T[1:n,'set']==1)/N
+    T[n,'FnB'] <- sum(T[1:n,'set']==2)/N
+    T[n,'DFn'] <- abs(T[n,'FnA']-T[n,'FnB'])
+  }
+  
+  c<-switch(toString(alpha),
+         "0.05" = 1.36,
+         "0.02" = 1.52,
+         1.63 # 0.01
+      ) * sqrt((2*N)/(N^2))
+  c(c=c,sup=max(T[,'DFn']))
+}
+
+#
+# Run simulation
+#
+sim.mix.distr <- function(nvals) {
+  # X1 ~ U[-2,2]
+  a <- -2; b <- 2; p1 <- 0.6
+  
+  # X2 ~ Exp(2)
+  lambda <- 2; p2 <- 0.4
+  
+  xx <- seq(a-1, b+1, (b-a)/nvals)
+  fx <- pdf(xx, p1, a, b, lambda)
+  gx <- gen.mix.distr(nvals, p1, a, b, lambda)
+  
+  brk = 25 * floor((log(nvals,10) - 1))
+  plot.mix.distr(xx, fx, gx, a, b, lambda, breaks=brk)
+  
+  fset <- ceiling((length(fx)-length(gx))/2)
+  fx   <- fx[fset:(length(fx)-fset)]
+  
+  ks <- ks.mix.distr(fx,gx,alpha=0.05)
+  cat(sprintf("RR=]%0.5f,+Inf[, D'=%0.5f", ks['c'], ks['sup']))
+  
+  qqplot(nvals, gx,fx)
 }
 
 

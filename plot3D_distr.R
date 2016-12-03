@@ -1,6 +1,6 @@
 library(rgl)
 
-pdf <- function(x,y,z0=NA) {
+pdf <- function(x, y, z0=NA) {
   z <- rep(z0,length(x))
   z[0<=y & y<=x & x<1] <- 2
   z
@@ -8,7 +8,7 @@ pdf <- function(x,y,z0=NA) {
 
 cdf <- function(x,y,z0=NA) {
   i <- c(0<=y & y<=x & x<1) 
-  z <- rep(z0,length(x))
+  z <- rep(z0, length(x))
   z[i] <- 2*x[i]*y[i]
   z
 }
