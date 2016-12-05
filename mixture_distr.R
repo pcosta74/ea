@@ -1,16 +1,26 @@
 #
-# f(x) = Sum[i=1..r]pifi(x)
+# f(x) = Sum[i=1..r]wifi(x)
 # X1 ~ U[-2,2]
 # X2 ~ Exp(2)
 #
-pdf <- function(x, p1, a, b, lambda) {
-  p1 * dunif(x, min=a, max=b) + (1-p1) * dexp(x, rate=lambda)
+pdf <- function(x, w1, a, b, lambda) {
+  w1 * dunif(x, min=a, max=b) + (1-w1) * dexp(x, rate=lambda)
 }
+
+#
+# F(x) = Sum[i=1..r]wiPi(x)
+# X1 ~ U[-2,2]
+# X2 ~ Exp(2)
+#
+cdf <- function(x, w1, a, b, lambda) {
+  w1 * punif(x, min=a, max=b) + (1-w1) * pexp(x, rate=lambda)
+}
+
 
 #
 # U ~ F(X) => X ~ F-1(U)
 # U ~ U[0,1]
-# X ~ p1*U[-2,2] + p2*Exp(2)
+# X ~ p1*f1(u) + p2*f2(u)
 #
 gen.mix.distr <- function(nvals, p1, a, b, lambda) {
   X <- NULL
@@ -54,11 +64,12 @@ plot.mix.distr <- function(XX, fx, gx, a, b, lambda, breaks=50) {
 qqplot <- function(nvals, X, Y) {
   q <- seq(0.5/nvals, 1 , 1/nvals)
   
-  qq.popX <- quantile(X, prob=q)
-  qq.popY <- quantile(Y, prob=q)
+  qq.popX <- quantile(sort(X), prob=q)
+  qq.popY <- quantile(sort(Y), prob=q)
   qq <- cbind(qq.popX, qq.popY)
   
-  plot(qq,pch=".", xlim=c(-3,3), ylim=c(-3,3), xlab="X", ylab="Y", main="QQ plot")
+  plot(qq,pch=".", xlim=c(-3,3), ylim=c(-3,3), 
+       xlab="X", ylab="Y", main="QQ plot")
   abline(0,1,col="red")
 }
 
@@ -81,11 +92,13 @@ ks.mix.distr <- function(A,B,alpha=0.01) {
   }
   
   c<-switch(toString(alpha),
-         "0.05" = 1.36,
-         "0.02" = 1.52,
-         1.63 # 0.01
+        "0.20" = 1.07,
+        "0.10" = 1.22,
+        "0.05" = 1.36,
+        "0.02" = 1.52,
+        1.63 # 0.01
       ) * sqrt((2*N)/(N^2))
-  c(c=c,sup=max(T[,'DFn']))
+  c(c=c,D=max(T[,'DFn']))
 }
 
 #
@@ -109,7 +122,7 @@ sim.mix.distr <- function(nvals) {
   fx   <- fx[fset:(length(fx)-fset)]
   
   ks <- ks.mix.distr(fx,gx,alpha=0.05)
-  cat(sprintf("RR=]%0.5f,+Inf[, D'=%0.5f", ks['c'], ks['sup']))
+  cat(sprintf("RR=]%0.5f,+Inf[, D'=%0.5f\n", ks['c'], ks['sup']))
   
   qqplot(nvals, gx,fx)
 }

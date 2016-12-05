@@ -27,9 +27,9 @@ gen.bivar.distr <- function(nvals) {
 #
 # Plot bivariate distribution
 #
-plot.bivar.distr <- function(XY, nvals) {
+plot.bivar.distr <- function(XY) {
   par(cex.axis=0.8, pty="s")
-  title <- sprintf('Distribution f(x,y)=2, 0≤y<x<1 (n=%d)', nvals)
+  title <- sprintf('Distribution f(x,y)=2, 0≤y<x<1 (n=%d)', nrow(XY))
   plot(XY, pch='.', xlim=c(0,1), ylim=c(0,1.5), col='gray45', main=title)
   abline(0, 1, col='red')
 }
@@ -39,4 +39,5 @@ plot.bivar.distr <- function(XY, nvals) {
 #
 sim.bivar.distr <- function(nvals) {
   XY <- gen.bivar.distr(nvals)
+  plot.bivar.distr(XY)
 }
