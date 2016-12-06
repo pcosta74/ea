@@ -1,4 +1,5 @@
 #
+# Probability Density Function (p.d.f)
 # f(x) = 2 <= 0<=y<x<1, 0 otherwise
 #
 pdf <- function(x,y) {
@@ -17,11 +18,10 @@ gen.bivar.distr <- function(nvals) {
 
   # Apply Inverse Transform Method
   X <- sqrt(U1)
-  Y <- sqrt(2*X*U2)
+  Y <- X*U2
   
   # Return Random Variables
-  XY <- cbind(X,Y)
-  XY
+  cbind(X=X,Y=Y)
 }
 
 #
@@ -30,7 +30,7 @@ gen.bivar.distr <- function(nvals) {
 plot.bivar.distr <- function(XY) {
   par(cex.axis=0.8, pty="s")
   title <- sprintf('Distribution f(x,y)=2, 0≤y<x<1 (n=%d)', nrow(XY))
-  plot(XY, pch='.', xlim=c(0,1), ylim=c(0,1.5), col='gray45', main=title)
+  plot(XY, pch='.', xlim=c(0,1), ylim=c(0,1), col='gray45', main=title)
   abline(0, 1, col='red')
 }
 
