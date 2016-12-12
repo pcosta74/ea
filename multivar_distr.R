@@ -9,9 +9,9 @@ pdf <- function(x,y) {
 #
 # U ~ F(X) => X ~ F-1(U)
 # U ~ U[0,1]
-# XY ~ Fx(X)Fx|y(y|X=x)
+# XY ~ Fx-1(U1)Fu1|u2(U2|U1=u1)
 #
-gen.bivar.distr <- function(nvals) {
+gen.bivar.sample <- function(nvals) {
   # Generate variables U1 ~ U[0,1], U2 ~ U[0,1]
   U1 <- runif(nvals)
   U2 <- runif(nvals)
@@ -27,7 +27,7 @@ gen.bivar.distr <- function(nvals) {
 #
 # Plot bivariate distribution
 #
-plot.bivar.distr <- function(XY) {
+plot.bivar.sample <- function(XY) {
   par(cex.axis=0.8, pty="s")
   title <- sprintf('Distribution f(x,y)=2, 0≤y<x<1 (n=%d)', nrow(XY))
   plot(XY, pch='.', xlim=c(0,1), ylim=c(0,1), col='gray45', main=title)
@@ -38,6 +38,6 @@ plot.bivar.distr <- function(XY) {
 # Run simulation
 #
 sim.bivar.distr <- function(nvals) {
-  XY <- gen.bivar.distr(nvals)
-  plot.bivar.distr(XY)
+  XY <- gen.bivar.sample(nvals)
+  plot.bivar.sample(XY)
 }

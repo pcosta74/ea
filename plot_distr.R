@@ -4,7 +4,7 @@ source('mixture_distr.R')
 nvals  <- c(5000,25000,50000,250000)
 breaks <- c(50,100,100,100)
 
-dim.W  <-800
+dim.W  <-700
 dim.H  <-700
 
 # for(i in seq_along(nvals)) {
@@ -20,7 +20,7 @@ for(n in nvals) {
   filename <- sprintf('multivar_distr_%d.png',n)
   png(file=filename, width=dim.W, height=dim.H)
   
-  test.bivar.distr(n)
+  sim.bivar.distr(n)
   
   dev.off()
 }
