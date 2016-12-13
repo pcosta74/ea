@@ -7,9 +7,18 @@ pdf <- function(x,y) {
 }
 
 #
+# Cumulative Distribution Function (cdf)
+# f(x) = 2 <= 0<=y<x<1, 0 otherwise
+#
+cdf <- function(x,y) {
+  2*y*(x-y)*(0<=y & y<x & x<1)
+}
+
+
+#
 # U ~ F(X) => X ~ F-1(U)
 # U ~ U[0,1]
-# XY ~ Fx-1(U1)Fu1|u2(U2|U1=u1)
+# XY ~ Fx(X)Fx|y(y|X=x)
 #
 gen.bivar.sample <- function(nvals) {
   # Generate variables U1 ~ U[0,1], U2 ~ U[0,1]

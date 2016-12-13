@@ -1,27 +1,18 @@
 library(rgl)
 
-pdf <- function(x, y, z0=NA) {
-  z <- rep(z0,length(x))
-  z[0<=y & y<=x & x<1] <- 2
-  z
-}
-
-cdf <- function(x,y,z0=NA) {
-  i <- c(0<=y & y<=x & x<1) 
-  z <- rep(z0, length(x))
-  z[i] <- 2*x[i]*y[i]
-  z
-}
-
-plot3D_fun <- function(x,y,FUN=pdf,z0=NA) {
-  z <- FUN(x,y,z0)
+plot3D.fun <- function(x, y, FUN, zero.exclude=FALSE) {
+  z <- FUN(x,y)
   
   x.min <- floor(min(x, na.rm = TRUE))
   x.max <- ceiling(max(x, na.rm = TRUE))
   y.min <- floor(min(y, na.rm = TRUE))
   y.max <- ceiling(max(y, na.rm = TRUE))
-  z.min <- floor(min(z, 0, na.rm = TRUE))
-  z.max <- ceiling(max(z, 2, na.rm = TRUE)) + 1
+  z.min <- floor(min(z, na.rm = TRUE))
+  z.max <- ceiling(max(z, na.rm = TRUE)) + 1
+  
+  if(zero.exclude) {
+    z[z==0] <- NA
+  }
   
   open3d(cex=0.7)
   plot3d(x, y, z, pch='.', 
@@ -35,12 +26,8 @@ plot3D_fun <- function(x,y,FUN=pdf,z0=NA) {
   grid3d(side=c('x', 'y', 'z-'), col = "#F3F3F3")  
 }
 
-N <- 25000
-X <- runif(N)
-Y <- runif(N)
-plot3D_fun(X,Y,FUN=pdf)
+N <- 50000
+X <- runif(N, min = -1,max = 2)
+Y <- runif(N, min = -1,max = 2)
+plot3D.fun(X,Y,FUN=pdf)
 plot3D_fun(X,Y,FUN=cdf)
-
-#X <- runif(N,-1,2)
-#Y <- runif(N,-1,2)
-#plot_pdf(X,Y)
