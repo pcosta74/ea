@@ -1,6 +1,6 @@
 #
 # Probability Density Function (p.d.f)
-# f(x) = 2 <= 0<=y<x<1, 0 otherwise
+# f(x) = 2 if 0≤y<x<1, 0 otherwise
 #
 pdf <- function(x,y) {
   2*(0<=y & y<x & x<1)
@@ -8,7 +8,7 @@ pdf <- function(x,y) {
 
 #
 # Cumulative Distribution Function (cdf)
-# f(x) = 2 <= 0<=y<x<1, 0 otherwise
+# f(x) = 2 if 0≤y<x<1, 0 otherwise
 #
 cdf <- function(x,y) {
   2*y*(x-y)*(0<=y & y<x & x<1)
@@ -49,4 +49,5 @@ plot.bivar.sample <- function(XY) {
 sim.bivar.distr <- function(nvals) {
   XY <- gen.bivar.sample(nvals)
   plot.bivar.sample(XY)
+  XY
 }

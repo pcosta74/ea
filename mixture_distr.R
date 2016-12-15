@@ -1,3 +1,5 @@
+library(lamW)
+
 #
 # f(x) = Sum[i=1..r]wifi(x)
 # X1 ~ U[-2,2]
@@ -17,10 +19,27 @@ cdf <- function(x, w1, a, b, lambda) {
 }
 
 #
-# Random generated sample
+# Random sample function
 #
-rgs <- function(n, w1, a, b, lambda) {
-  w1 * runif(n, min=a, max=b) + (1-w1) * rexp(n, rate=lambda)
+rsf <- function(nvals) {
+  X <- NULL
+  U <- runif(nvals)
+  
+  n  <- 0
+  while(n < nvals) {
+    n <- n+1
+    if(U[n] > 0.993) { # u>0.993
+      X[n] <- -0.5*log((1-U[n])/0.4)
+    } 
+    else if(U[n]>0.3) { # 0.3<u≤0.993
+      z <- (16/3)*exp((28/3)-(40/3)*U[n])
+      X[n] <- 0.5*lambertW0(z)+(20/3)*U[n]-(14/3)
+    } 
+    else { # 0<u≤0.3 
+      X[n] <- (U[n]-0.30)/0.15
+    }
+  }
+  X
 }
 
 #
@@ -68,19 +87,20 @@ plot.mix.sample <- function(XX, fx, gx, a, b, lambda, breaks=50) {
 # QQ plot
 #
 qq.plot <- function(X, Y) {
-  nvals <- length(X)
+  nvals <- length(Y)
   q <- seq(0.5/nvals, 1 , 1/nvals)
   
   qq.popX <- quantile(sort(X), prob=q)
   qq.popY <- quantile(sort(Y), prob=q)
   qq <- cbind(qq.popX, qq.popY)
   
-  x.min <- floor(min(qq.popX)); x.max <- ceiling(max(qq.popX))
-  y.min <- floor(min(qq.popY)); y.max <- ceiling(max(qq.popY))
+  x.min <- floor(min(qq.popX)); x.max <- -x.min+1
+  y.min <- floor(min(qq.popY)); y.max <- -y.min+1
   
+  par(cex.axis=0.8, pty="s")
   plot(qq,pch=".", xlim=c(x.min,x.max), ylim=c(y.min,y.max), 
        xlab="X", ylab="Y", main="QQ plot")
-  abline(0,1,col="red")
+  abline(0,1,col="green")
 }
 
 
@@ -97,15 +117,13 @@ sim.mix.distr <- function(nvals) {
   xx <- seq(a-1, b+1, (b-a)/nvals)
   fx <- pdf(xx, p1, a, b, lambda)
   gx <- gen.mix.sample(nvals, p1, a, b, lambda)
-  rx <- 
+  rx <- rsf(nvals)
   
   brk = 25 * floor((log(nvals,10) - 1))
   plot.mix.sample(xx, fx, gx, a, b, lambda, breaks=brk)
   
-  #ks.test(Fx,Gx)
-  qqplot(nvals, rx, fx)
-  
-  gx
+  qq.plot(rx, gx)
+  ks.test(rx, gx)
 }
 
 
