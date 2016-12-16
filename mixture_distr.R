@@ -119,20 +119,20 @@ sim.mix.distr <- function(nvals) {
   fx <- pdf(xx, p1, a, b, lambda)
   rx <- rsf(nvals)
 
-  
-  filename <- sprintf('output/mix_distr_sample_%d.png', nvals)
-  png(file=filename, width=dim.W, height=dim.H)
+  #filename <- sprintf('output/mix_distr_sample_%d.png', nvals)
+  #png(file=filename, width=dim.W, height=dim.H)
   brk = 25 * floor((log(nvals,10) - 1))
   plot.mix.sample(X, fx, a, b, lambda, xx.axis=xx, breaks=brk)
-  dev.off()
+  #dev.off()
   
-  filename <- sprintf('output/mix_distr_qqplot_%d.png', nvals)
-  png(file=filename, width=dim.W, height=dim.H)
+  #filename <- sprintf('output/mix_distr_qqplot_%d.png', nvals)
+  #png(file=filename, width=dim.W, height=dim.H)
   qq.plot(X, rx, main="QQ plot", xlab="X", ylab="rx")
-  dev.off()
+  #dev.off()
   
-  filename <- sprintf('output/mix_distr_kstest_%d.txt', nvals)
-  capture.output(ks.test(X, rx),file = filename)
+  #filename <- sprintf('output/mix_distr_kstest_%d.txt', nvals)
+  # capture.output(ks.test(X, rx),file = filename)
+  ks.test(X, rx)
 }
 
 
