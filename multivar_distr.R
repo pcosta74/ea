@@ -48,6 +48,11 @@ plot.bivar.sample <- function(XY) {
 #
 sim.bivar.distr <- function(nvals) {
   XY <- gen.bivar.sample(nvals)
+  
+  # filename <- sprintf('multivar_distr_%d.png',n)
+  # png(file=filename, width=dim.W, height=dim.H)
   plot.bivar.sample(XY)
+  # dev.off()
+  
   XY
 }

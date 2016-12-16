@@ -20,18 +20,18 @@ cdf <- function(x, w1, a, b, lambda) {
 
 #
 # Random sample function
+# U ~ U[0,1]
+# X ~ F(x) = Sum[i=1..r]wiPi(x)
 #
 rsf <- function(nvals) {
   X <- NULL
   U <- runif(nvals)
   
-  n  <- 0
-  while(n < nvals) {
-    n <- n+1
+  for(n in seq_along(U)) {
     if(U[n] > 0.993) { # u>0.993
       X[n] <- -0.5*log((1-U[n])/0.4)
     } 
-    else if(U[n]>0.3) { # 0.3<u≤0.993
+    else if(U[n] > 0.3) { # 0.3<u≤0.993
       z <- (16/3)*exp((28/3)-(40/3)*U[n])
       X[n] <- 0.5*lambertW0(z)+(20/3)*U[n]-(14/3)
     } 
@@ -68,25 +68,25 @@ gen.mix.sample <- function(nvals, p1, a, b, lambda) {
 #
 # Plot the distributions
 #
-plot.mix.sample <- function(XX, fx, gx, a, b, lambda, breaks=50) {
+plot.mix.sample <- function(X, fx, a, b, lambda, xx.axis, breaks=50) {
   
-  x.min <- min(XX); y.min <- 0
-  x.max <- max(XX); y.max <- 1 
+  x.min <- min(xx.axis); y.min <- 0
+  x.max <- max(xx.axis); y.max <- 1 
   
   title <- sprintf("Composition method to add U[%d,%d] and Exp(%d)",
                    a, b, lambda)
   
   par(cex.axis=0.8, pty="s")
-  hist(gx, probability=TRUE, breaks=breaks,
+  hist(X, probability=TRUE, breaks=breaks,
        xlim=c(x.min,x.max), ylim=c(y.min,y.max),
        xlab="x", ylab="f(x)", main=title)
-  lines(XX, fx, col='red')
+  lines(xx.axis, fx, col='red')
 }
 
 #
 # QQ plot
 #
-qq.plot <- function(X, Y) {
+qq.plot <- function(X, Y, main=main, xlab="X", xlab="Y") {
   nvals <- length(Y)
   q <- seq(0.5/nvals, 1 , 1/nvals)
   
@@ -99,7 +99,7 @@ qq.plot <- function(X, Y) {
   
   par(cex.axis=0.8, pty="s")
   plot(qq,pch=".", xlim=c(x.min,x.max), ylim=c(y.min,y.max), 
-       xlab="X", ylab="Y", main="QQ plot")
+       main=main, xlab=xlab, ylab=ylab)
   abline(0,1,col="green")
 }
 
@@ -115,15 +115,24 @@ sim.mix.distr <- function(nvals) {
   lambda <- 2; p2 <- 0.4
   
   xx <- seq(a-1, b+1, (b-a)/nvals)
+  X  <- gen.mix.sample(nvals, p1, a, b, lambda)
   fx <- pdf(xx, p1, a, b, lambda)
-  gx <- gen.mix.sample(nvals, p1, a, b, lambda)
   rx <- rsf(nvals)
+
   
+  filename <- sprintf('output/mix_distr_sample_%d.png', nvals)
+  png(file=filename, width=dim.W, height=dim.H)
   brk = 25 * floor((log(nvals,10) - 1))
-  plot.mix.sample(xx, fx, gx, a, b, lambda, breaks=brk)
+  plot.mix.sample(X, fx, a, b, lambda, xx.axis=xx, breaks=brk)
+  dev.off()
   
-  qq.plot(rx, gx)
-  ks.test(rx, gx)
+  filename <- sprintf('output/mix_distr_qqplot_%d.png', nvals)
+  png(file=filename, width=dim.W, height=dim.H)
+  qq.plot(X, rx, main="QQ plot", xlab="X", ylab="rx")
+  dev.off()
+  
+  filename <- sprintf('output/mix_distr_kstest_%d.txt', nvals)
+  capture.output(ks.test(X, rx),file = filename)
 }
 
 
