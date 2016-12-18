@@ -3,7 +3,7 @@ library(rgl)
 #
 # Plot functions in 3D
 #
-plot3D.fun <- function(x, y, FUN, zero.exclude=FALSE) {
+plot3D <- function(x, y, FUN, zero.exclude=FALSE) {
   z <- FUN(x,y)
   
   x.min <- floor(min(x, na.rm = TRUE))
@@ -33,13 +33,23 @@ plot3D.fun <- function(x, y, FUN, zero.exclude=FALSE) {
 #
 # Plot functions in 3D
 #
-hist3D.fun <- function(x, y) {
-  mtext3d('X',edge='x',at=1.1)
-  mtext3d('Y',edge='y',at=1.1)
-  mtext3d('Z',edge='z',at=.7)
-  axes3d(edges=c('x','y','z'), labels=T, expand=c(1,1,.6))
-  grid3d(side=c('x','y','z'), col = "#F3F3F3")  
-  hist3d(x, y, alpha=0.7, nclass=50, scale=100)
+hist3D <- function(x, y, nclass=10, scale=1, alpha=1,
+                   xlim=c(0,1), ylim=c(0,1), zlim=c(0,1),
+                   xlab='X', ylab='Y', zlab='Z', col='#cccccc') {
+
+  open3d(cex=0.7)
+  mtext3d(xlab, edge='x', at=max(xlim)+.1)
+  mtext3d(ylab, edge='y', at=max(ylim)+.1)
+  mtext3d(zlab, edge='z', at=max(zlim)+.1)
+  
+  decorate3d(xlim=xlim, ylim=ylim, zlim=zlim,
+             xlab='', ylab='', zlab='',
+             box=FALSE, axes=FALSE)
+  aspect3d(1,1,0.9)
+  axes3d(edges=c('x','y','z'), labels=T)
+  grid3d(side=c('x','y','z'), col = "#F3F3F3")
+  
+  .hist3d(x, y, alpha=alpha, nclass=nclass, scale=scale, topcol=col)
 }
 ################################################################################
 # Copied from rgl's hist3D demo
@@ -58,10 +68,10 @@ hist3D.fun <- function(x, y) {
 #
 #
 #
-binplot.3d<-function(x,y,z,alpha=1,topcol="#ff0000",sidecol="#cccccc")
+.binplot3d<-function(x,y,z,alpha=1,topcol="#ff0000",sidecol="#cccccc")
 {
-  #save <- par3d(skipRedraw=TRUE)
-  #on.exit(par3d(save))
+  save <- par3d(skipRedraw=TRUE)
+  on.exit(par3d(save))
   
   x1<-c(rep(c(x[1],x[2],x[2],x[1]),3),rep(x[1],4),rep(x[2],4))
   z1<-c(rep(0,4),rep(c(0,0,z,z),4))
@@ -78,7 +88,8 @@ binplot.3d<-function(x,y,z,alpha=1,topcol="#ff0000",sidecol="#cccccc")
 #
 #
 #
-hist3d<-function(x,y=NULL,nclass="auto",alpha=1,col="#ff0000",scale=10)
+.hist3d<-function(x,y=NULL,nclass="auto",alpha=1,scale=10,
+                  topcol="#ff0000",sidecol="#cccccc")
 {
   save <- par3d(skipRedraw=TRUE)
   on.exit(par3d(save))
@@ -96,16 +107,12 @@ hist3d<-function(x,y=NULL,nclass="auto",alpha=1,col="#ff0000",scale=10)
     for (j in 1:nclass) 
     {
       z[i,j] <- (1/n)*sum(x < breaks.x[i+1] & y < breaks.y[j+1] & 
-                             x >= breaks.x[i] & y >= breaks.y[j])
-      binplot.3d(c(breaks.x[i],breaks.x[i+1]),c(breaks.y[j],breaks.y[j+1]),
-                 scale*z[i,j],alpha=alpha,topcol=col)
+                          x >= breaks.x[i]  & y >= breaks.y[j])
+      .binplot3d(c(breaks.x[i],breaks.x[i+1]),c(breaks.y[j],breaks.y[j+1]),
+                 scale*z[i,j],alpha=alpha,topcol=topcol,sidecol=sidecol)
     }
   }
 }
 
 ################################################################################
 
-
-N <- 50000
-X <- runif(N, min = -1,max = 2)
-Y <- runif(N, min = -1,max = 2)

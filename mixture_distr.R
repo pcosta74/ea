@@ -28,15 +28,18 @@ rsf <- function(nvals) {
   U <- runif(nvals)
   
   for(n in seq_along(U)) {
-    if(U[n] > 0.993) { # u>0.993
+    if(U[n] > 0.993) { # u > 0.993
       X[n] <- -0.5*log((1-U[n])/0.4)
     } 
-    else if(U[n] > 0.3) { # 0.3<u≤0.993
+    else if(U[n] > 0.3) { # 0.3 < u ≤ 0.993
       z <- (16/3)*exp((28/3)-(40/3)*U[n])
       X[n] <- 0.5*lambertW0(z)+(20/3)*U[n]-(14/3)
     } 
-    else { # 0<u≤0.3 
+    else if(U[n] > 0) { # 0 < u ≤ 0.3 
       X[n] <- (U[n]-0.30)/0.15
+    }
+    else { # 0 ≤ u 
+      X[n] <- 0
     }
   }
   X
@@ -73,20 +76,20 @@ plot.mix.sample <- function(X, fx, a, b, lambda, xx.axis, breaks=50) {
   x.min <- min(xx.axis); y.min <- 0
   x.max <- max(xx.axis); y.max <- 1 
   
-  title <- sprintf("Composition method to add U[%d,%d] and Exp(%d)",
+  title <- sprintf('Composition method to add U[%d,%d] and Exp(%d)',
                    a, b, lambda)
   
   par(cex.axis=0.8, pty="s")
   hist(X, probability=TRUE, breaks=breaks,
        xlim=c(x.min,x.max), ylim=c(y.min,y.max),
-       xlab="x", ylab="f(x)", main=title)
+       xlab='x', ylab='f(x)', main=title)
   lines(xx.axis, fx, col='red')
 }
 
 #
 # QQ plot
 #
-qq.plot <- function(X, Y, main=main, xlab="X", xlab="Y") {
+qq.plot <- function(X, Y, main=main, xlab='X', ylab='Y', col='green') {
   nvals <- length(Y)
   q <- seq(0.5/nvals, 1 , 1/nvals)
   
@@ -100,7 +103,7 @@ qq.plot <- function(X, Y, main=main, xlab="X", xlab="Y") {
   par(cex.axis=0.8, pty="s")
   plot(qq,pch=".", xlim=c(x.min,x.max), ylim=c(y.min,y.max), 
        main=main, xlab=xlab, ylab=ylab)
-  abline(0,1,col="green")
+  abline(0,1,col=col)
 }
 
 
@@ -119,6 +122,7 @@ sim.mix.distr <- function(nvals) {
   fx <- pdf(xx, p1, a, b, lambda)
   rx <- rsf(nvals)
 
+  #dim.W <- 700; dim.H <- 700 
   #filename <- sprintf('output/mix_distr_sample_%d.png', nvals)
   #png(file=filename, width=dim.W, height=dim.H)
   brk = 25 * floor((log(nvals,10) - 1))
