@@ -48,7 +48,7 @@ plot.bivar.sample <- function(XY) {
 #
 # Plot bivariate distribution 3D
 #
-plot3D.bivar.sample <- function(XY) {
+plot3D.bivar.sample <- function(XY, breaks=10) {
   XY <- xy.coords(XY)
   um <- matrix(c(-0.8076876, 0.5884517,-0.03695673, 0,
                  -0.4632577,-0.5945783, 0.65716797, 0,
@@ -57,7 +57,7 @@ plot3D.bivar.sample <- function(XY) {
                nrow=4,ncol=4,byrow=TRUE)
   wr <- c(x=0, y=0, width=512, height=512)
   
-  hist3D(XY$x, XY$y, nclass=22, probability = TRUE,
+  hist3D(XY$x, XY$y, nclass=breaks, probability = TRUE,
          xlim=c(0,1), ylim=c(0,1), zlim=c(0,3), col='#ffffff')
   triangles3d(x=c(0,1,1),y=c(0,0,1),z=c(2,2,2), col='#ff0000',
               alpha=0.5)
@@ -77,6 +77,6 @@ sim.bivar.distr <- function(nvals) {
   # dev.off()
   
   # filename <- sprintf('multivar_distr_3d_%d.png',nvals)
-  plot3D.bivar.sample(XY)
+  plot3D.bivar.sample(XY, breaks=25)
   # snapshot3d(filename)
 }

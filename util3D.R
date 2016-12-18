@@ -107,16 +107,16 @@ hist3D <- function(x, y, nclass=10, plot=TRUE, probability=FALSE,
   xy <- xy.coords(x,y)
   x <- xy$x
   y <- xy$y
-  n <- ifelse(probability, (nclass+1)^2, 1)
-  
+  n <- ifelse(probability,(nclass^2)/length(x),1)
+
   breaks.x <- seq(min(x),max(x),length=(nclass+1))
   breaks.y <- seq(min(y),max(y),length=(nclass+1))
   
   z <- matrix(0,(nclass),(nclass))
   for (i in 1:nclass) {
     for (j in 1:nclass) {
-      z[i,j] <- (1/n)*sum(x <= breaks.x[i+1] & y <= breaks.y[j+1] & 
-                          x >  breaks.x[i]   & y >  breaks.y[j])
+      z[i,j] <- n*sum(breaks.x[i] <= x & x < breaks.x[i+1] &
+                      breaks.y[j] <= y & y < breaks.y[j+1])
     }
   }  
   
