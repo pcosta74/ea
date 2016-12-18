@@ -33,40 +33,51 @@ plot3D <- function(x, y, FUN, zero.exclude=FALSE) {
 #
 # Plot functions in 3D
 #
-hist3D <- function(x, y, nclass=10, scale=1, alpha=1,
+hist3D <- function(x, y, nclass=10, plot=TRUE, probability=FALSE,
                    xlim=c(0,1), ylim=c(0,1), zlim=c(0,1),
-                   xlab='X', ylab='Y', zlab='Z', col='#cccccc') {
+                   xlab='X', ylab='Y', zlab='Z',
+                   alpha=1, col='#cccccc') {
 
-  open3d(cex=0.7)
-  mtext3d(xlab, edge='x', at=max(xlim)+.1)
-  mtext3d(ylab, edge='y', at=max(ylim)+.1)
-  mtext3d(zlab, edge='z', at=max(zlim)+.1)
+
+  if(plot) { open3d(cex=0.7) }
   
-  decorate3d(xlim=xlim, ylim=ylim, zlim=zlim,
-             xlab='', ylab='', zlab='',
-             box=FALSE, axes=FALSE)
-  aspect3d(1,1,0.9)
-  axes3d(edges=c('x','y','z'), labels=T)
-  grid3d(side=c('x','y','z'), col = "#F3F3F3")
+  z <- .hist3d(x, y, nclass=nclass, plot=plot, probability=probability,
+               alpha=alpha, topcol=col)
   
-  .hist3d(x, y, alpha=alpha, nclass=nclass, scale=scale, topcol=col)
+  if(plot) {
+    mtext3d(xlab, edge='x', at=max(xlim)+.1)
+    mtext3d(ylab, edge='y', at=max(ylim)+.1)
+    mtext3d(zlab, edge='z', at=max(zlim)+.1)
+    
+    decorate3d(box=FALSE, axes=FALSE,
+               xlim=xlim, ylim=ylim, zlim=zlim,
+               xlab='', ylab='', zlab='')
+    axes3d(edges=c('x','y','z'), labels=T)
+    grid3d(side=c('x','y','z'), col = "#F3F3F3")
+    aspect3d(1,1,0.5)
+  }
+  
+  return(z)
 }
+
+
 ################################################################################
-# Copied from rgl's hist3D demo
+# Addapted from rgl's hist3D demo
 #
 # Package ‘rgl’
 # August 25, 2016
 # Version 0.96.0
 # Title 3D Visualization Using OpenGL
-# Author Daniel Adler <dadler@uni-goettingen.de>, Duncan Mur- doch <murdoch@stats.uwo.ca>, and others (see README)
+# Author Daniel Adler <dadler@unigoettingen.de>, Duncan Murdoch <murdoch@stats.uwo.ca>, and others (see README)
 # Maintainer Duncan Murdoch <murdoch@stats.uwo.ca>
 #   Depends R (>= 3.2.0)
 # License GPL
-# https://cran.r-project.org/web/packages/rgl/rgl.pdf
+# doc: https://cran.r-project.org/web/packages/rgl/rgl.pdf
+# src: https://github.com/trestletech/rgl/blob/master/demo/hist3d.r
 ################################################################################
 
 #
-#
+# Plot bin
 #
 .binplot3d<-function(x,y,z,alpha=1,topcol="#ff0000",sidecol="#cccccc")
 {
@@ -86,32 +97,44 @@ hist3D <- function(x, y, nclass=10, scale=1, alpha=1,
 }
 
 #
+# Histogram 3D
 #
-#
-.hist3d<-function(x,y=NULL,nclass="auto",alpha=1,scale=10,
-                  topcol="#ff0000",sidecol="#cccccc")
+.hist3d<-function(x,y=NULL,nclass="auto", plot=TRUE, probability=FALSE,
+                  alpha=1, topcol="#ff0000",sidecol="#cccccc")
 {
-  save <- par3d(skipRedraw=TRUE)
-  on.exit(par3d(save))
+  if (nclass == "auto") { nclass<-ceiling(sqrt(nclass.Sturges(x))) }
   
   xy <- xy.coords(x,y)
   x <- xy$x
   y <- xy$y
-  n<-length(x)
-  if (nclass == "auto") { nclass<-ceiling(sqrt(nclass.Sturges(x))) }
+  n <- ifelse(probability, (nclass+1)^2, 1)
+  
   breaks.x <- seq(min(x),max(x),length=(nclass+1))
   breaks.y <- seq(min(y),max(y),length=(nclass+1))
-  z<-matrix(0,(nclass),(nclass))
-  for (i in 1:nclass) 
-  {
-    for (j in 1:nclass) 
-    {
-      z[i,j] <- (1/n)*sum(x < breaks.x[i+1] & y < breaks.y[j+1] & 
-                          x >= breaks.x[i]  & y >= breaks.y[j])
-      .binplot3d(c(breaks.x[i],breaks.x[i+1]),c(breaks.y[j],breaks.y[j+1]),
-                 scale*z[i,j],alpha=alpha,topcol=topcol,sidecol=sidecol)
+  
+  z <- matrix(0,(nclass),(nclass))
+  for (i in 1:nclass) {
+    for (j in 1:nclass) {
+      z[i,j] <- (1/n)*sum(x <= breaks.x[i+1] & y <= breaks.y[j+1] & 
+                          x >  breaks.x[i]   & y >  breaks.y[j])
     }
+  }  
+  
+  if(plot) {
+    save <- par3d(skipRedraw=TRUE)
+    on.exit(par3d(save))
+
+    for (i in 1:nclass) {
+      for (j in 1:nclass) {
+        .binplot3d(c(breaks.x[i],breaks.x[i+1]),c(breaks.y[j],breaks.y[j+1]),
+                   z[i,j],alpha=alpha,topcol=topcol,sidecol=sidecol)
+      }
+    }
+    
+    z <- NULL
   }
+  
+  return(z)
 }
 
 ################################################################################

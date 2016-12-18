@@ -57,9 +57,9 @@ plot3D.bivar.sample <- function(XY) {
                nrow=4,ncol=4,byrow=TRUE)
   wr <- c(x=0, y=0, width=512, height=512)
   
-  hist3D(XY$x, XY$y, nclass=20, scale=400,
+  hist3D(XY$x, XY$y, nclass=22, probability = TRUE,
          xlim=c(0,1), ylim=c(0,1), zlim=c(0,3), col='#ffffff')
-  triangles3d(x=c(0,1,1),y=c(0,0,1),z=c(2,2,2)-0.01, col='#ff0000',
+  triangles3d(x=c(0,1,1),y=c(0,0,1),z=c(2,2,2), col='#ff0000',
               alpha=0.5)
   par3d(userMatrix=um, windowRect=wr)
 }
