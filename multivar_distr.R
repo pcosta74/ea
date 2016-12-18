@@ -48,7 +48,7 @@ plot.bivar.sample <- function(XY) {
 #
 # Plot bivariate distribution 3D
 #
-plot3D.bivar.sample <- function(XY, breaks=10) {
+plot3D.bivar.sample <- function(XY, breaks=20) {
   XY <- xy.coords(XY)
   um <- matrix(c(-0.8076876, 0.5884517,-0.03695673, 0,
                  -0.4632577,-0.5945783, 0.65716797, 0,
@@ -77,6 +77,6 @@ sim.bivar.distr <- function(nvals) {
   # dev.off()
   
   # filename <- sprintf('multivar_distr_3d_%d.png',nvals)
-  plot3D.bivar.sample(XY, breaks=25)
+  plot3D.bivar.sample(XY)
   # snapshot3d(filename)
 }
